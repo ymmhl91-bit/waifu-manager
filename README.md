@@ -209,6 +209,7 @@ python3 cli.py apply
 .
 ├── README.md
 ├── LICENSE
+├── NOTICE                    # 许可依据与第三方声明
 ├── CHANGELOG.md
 ├── .gitignore
 ├── waifu-1.1.7-slim.toolpkg        # 补丁版插件包
@@ -226,7 +227,7 @@ python3 cli.py apply
 
 ## 许可
 
-本项目以 **[LGPL-3.0](./LICENSE)** 发布。
+本项目以 **[LGPL-3.0](./LICENSE)** 发布。完整许可依据与第三方声明见 **[NOTICE](./NOTICE)**。
 
 `waifu-1.1.7-slim.toolpkg` 是对 Operit 内置插件 `com.operit.waifu` 的修改版本。
 Operit 主程序（[AAswordman/Operit](https://github.com/AAswordman/Operit)）以 LGPL-3.0 发布，
