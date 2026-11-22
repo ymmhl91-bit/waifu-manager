@@ -1,4 +1,4 @@
-# 嘕隐经理
+# waifu-manager
 
 [![Operit](https://img.shields.io/badge/Operit-ToolPkg-blue)](https://github.com/ymmhl91-bit/operit-clawd)
 [![Python](https://img.shields.io/badge/Python-3.8%2B-brightgreen)](https://www.python.org/)
@@ -24,7 +24,7 @@ const emotions = { crying: "哭泣", like_you: "喜欢你", happy: "开心", /* 
 | 问题 | 后果 |
 |---|---|
 | 分类写死 | 自定义分类（如 `playful`、`hungry`）在设置页**完全不显示** |
-| 点击弹回 | 一旦点了内置分类，**再也切不回**自特之 类 |
+| 点击弹回 | 一旦点了内置分类，**再也切不回**自定义分类 |
 | 无法移动 | 图片只能在原分类删除、重新导入，不能跨类迁移 |
 
 本项目提供两样东西解决它：
@@ -264,4 +264,4 @@ Operit 主程序（[AAswordman/Operit](https://github.com/AAswordman/Operit)）�
 ## 相关
 
 - [Operit](https://github.com/ymmhl91-bit/operit-clawd) — 本项目所服务的平台
-
+- waifu 插件 — Operit 内置插件，未开源
