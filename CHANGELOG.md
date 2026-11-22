@@ -2,6 +2,17 @@
 
 本项目版本随 `waifu-<version>.toolpkg` 命名。
 
+## [repo] - 2026-11-22
+
+### Changed
+- **二进制改为仅通过 GitHub Releases 分发**，不再入仓
+- `.gitignore` 增加 `*.toolpkg`
+- README 安装说明改为从 Releases 下载，并附 curl 命令
+- README 增加 Release 徽章
+
+### Why
+避免仓库随版本更迭持续膨胀（每版 66 KB 起，且 git 对二进制不做增量压缩）。
+
 ## [1.1.7-slim] - 2026-11-22
 
 ### Removed

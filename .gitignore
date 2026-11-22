@@ -52,3 +52,6 @@ scheme.json
 # 运行时导出的配置文件（含设备路径，不应提交）
 mode.json
 waifu.json
+
+# 构建产物：二进制走 GitHub Releases，不入库
+*.toolpkg

@@ -3,6 +3,7 @@
 [![Operit](https://img.shields.io/badge/Operit-ToolPkg-blue)](https://github.com/ymmhl91-bit/operit-clawd)
 [![Python](https://img.shields.io/badge/Python-3.8%2B-brightgreen)](https://www.python.org/)
 [![License](https://img.shields.io/badge/License-LGPL--3.0-blue)](./LICENSE)
+[![Release](https://img.shields.io/github/v/release/ymmhl91-bit/waifu-manager)](https://github.com/ymmhl91-bit/waifu-manager/releases/latest)
 
 给 **Operit** 的 waifu 插件补上自定义情绪分类能力，并提供一个命令行管理器做批量整理。
 
@@ -37,17 +38,30 @@ const emotions = { crying: "哭泣", like_you: "喜欢你", happy: "开心", /* 
 
 ### 方式一：用补丁版插件（需要写文件权限）
 
+**1. 下载插件包**
+
+从 [Releases](https://github.com/ymmhl91-bit/waifu-manager/releases/latest) 下载 `waifu-1.1.7-slim.toolpkg`（66 KB）。
+
+或直接命令行：
+
 ```bash
-# 1. 备份原包
+curl -L -o waifu-1.1.7-slim.toolpkg \
+  https://github.com/ymmhl91-bit/waifu-manager/releases/latest/download/waifu-1.1.7-slim.toolpkg
+```
+
+**2. 替换插件文件**
+
+```bash
+# 备份原包
 cp <runtime>/extensions/device/packages/waifu.toolpkg ~/waifu-backup.toolpkg
 
-# 2. 替换
+# 替换
 cp waifu-1.1.7-slim.toolpkg <runtime>/extensions/device/packages/waifu.toolpkg
 
-# 3. 清缓存
+# 清缓存
 rm -rf <runtime>/cache/toolpkg/com.operit.waifu-*
 
-# 4. 完全退出 Operit 再重开
+# 完全退出 Operit 再重开
 ```
 
 其中 `<runtime>` 形如 `/data/user/0/app.operit/files/runtime/identities/identity-*`。
