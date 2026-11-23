@@ -302,9 +302,10 @@ operit2 package enable waifu
 
 - **官方推送 waifu 更新时可能覆盖本版本**，且无提示。想长期用就别在官方渠道更新 waifu。
 - 版本号 `1.1.4 → 1.1.8`，仅用于区分与规避同版本覆盖判定。
-- 已移除全部内置表情资源，包体积 3.68 MB。
+- 内置表情完整保留（53 张，9 大类），与上游一致。1.1.7 曾误删导致旧配置报 resource 错误，1.1.8 已修复。
 - `src/` 与 `dist/` 已同步修改，重新编译不会丢改动。
-- 只改 `dist/ui/settings.ui.js`、`src/ui/settings.ui.ts`，以及 `settings.js/ts`、`stickers.js/ts` 的默认值，其余代码与原包一致。
+- 与 qqbot 多账号改造等替换内置包类项目天然兼容：保持同名包 id `com.operit.waifu`，多账号版 qqbot 的 Waifu 依赖无需改动即可接入。
+- 实际只改 3 个文件：dist/ui/settings.ui.js、src/ui/settings.ui.ts、manifest.json。settings.js/ts 与 stickers.js/ts 在 1.1.8 已恢复为与上游逐字节一致。补丁源码见 plugins 目录。
 
 ---
 
@@ -345,5 +346,5 @@ operit2 package enable waifu
 
 ## 相关
 
-- [Operit](https://github.com/ymmhl91-bit/operit-clawd) — 本项目所服务的平台
-- waifu 插件 — Operit 内置插件，未开源
+- Operit2 平台 — https://github.com/AAswordman/Operit2
+- waifu 插件 — Operit2 内置插件，包内无独立 LICENSE 文件，许可随主仓库 AGPL-3.0
