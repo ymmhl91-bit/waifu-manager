@@ -7,63 +7,63 @@ Copyright (C) 2026 ymmhl91-bit
 
 ## 许可
 
-本仓库以 **GNU Lesser General Public License v3.0** 发布，完整协议文本见 [LICENSE](./LICENSE)。
+本仓库以 **GNU Affero General Public License v3.0**（AGPL-3.0）发布，
+完整协议文本见 [LICENSE](./LICENSE)。
 
-## 许可依据
+## 上游与许可依据
 
-本项目是对 **Operit** 平台内置插件 `com.operit.waifu` 的修改版本。
+本项目的上游是 **Operit2** 仓库中的 waifu 插件：
 
-- Operit 主程序：[AAswordman/Operit](https://github.com/AAswordman/Operit)，以 LGPL-3.0 发布
-- 本修改版作为其派生作品，沿用同一协议
+- 仓库：https://github.com/AAswordman/Operit2
+- 路径：`plugins/packages/external/waifu/`
+- 协议：**AGPL-3.0**（见 [Operit2 LICENSE](https://github.com/AAswordman/Operit2/blob/main/LICENSE)）
 
-`waifu-1.1.7-slim.toolpkg` 中包含完整的对应源码（`src/` 目录），
-满足 LGPL-3.0 关于修改版需提供源码的要求。
+`waifu-1.1.8.toolpkg` 是该插件的修改版，因此沿用同一协议 AGPL-3.0。
 
-## 关于内置表情资源
+> 注：一代 `AAswordman/Operit` 仓库使用 LGPL-3.0，但 waifu 插件属于 Operit2，
+> 不适用一代协议。
 
-原插件包含 53 张内置表情图片（`resources/` 目录，约 3.6 MB）。
+## 源码提供义务
 
-**本构建已将其全部移除**，理由：
+AGPL-3.0 要求分发二进制时提供对应源码。本项目同时提供：
 
-1. 避免再分发原作者的图像素材
-2. 包体积从 3.68 MB 降至 66 KB
-
-因此首次使用时 `emojis` 为空、`enableEmoticons` 默认关闭。
-需自行在设置页导入图片，至少有一个分类后再开启表情开关。
+- 包内完整的 `src/` 目录（TypeScript 源码）
+- 本仓库的 Git 历史，可追溯到每一处修改
 
 ## 本项目的改动
 
 详见 [docs/PATCH.md](./docs/PATCH.md)。概要：
 
 - `dist/ui/settings.ui.js` 与 `src/ui/settings.ui.ts`：分类列表动态化、新建/删除分类、图片跨类移动
-- `dist/settings.js` 与 `src/settings.ts`：`defaultSettings()` 的默认 `emojis` 改为空对象
-- `dist/stickers.js` 与 `src/stickers.ts`：清空 `bundledEmojis`
-- `manifest.json`：版本号、名称、描述，移除 `resources` 声明
-- 删除 `resources/` 目录
+- `manifest.json`：版本号、名称、描述
 
-其余代码文件与原插件逐字节一致。
+其余文件（包括全部 `resources/` 内置表情、`dist/sentences.js`、`dist/service.js` 等）
+与上游一致。
 
----
+## 本项目与上游的区别
+
+- 版本号 `1.1.4 → 1.1.8`，用于区分并规避同版本覆盖判定
+- **内置表情完整保留**（53 张，9 大类），与上游一致
+- 只改 UI 层，不动分句、提示词拼接、配置读写等核心逻辑
 
 ## 权利主张与撤下请求
 
-本项目不主张对原 waifu 插件及其任何素材的所有权。
+上游代码与素材的版权归原作者所有。
 
-若原作者或权利持有人认为本仓库存在不当之处，请提交 issue 说明，
-将在一个工作日内响应并按要求下架相关内容。
+若原作者认为本仓库存在不当之处，请提交 issue，将及时响应并按要求下架。
 
 ---
 
 ## Third-party notice (English)
 
-This repository is distributed under the GNU Lesser General Public License v3.0.
+This repository is distributed under the GNU Affero General Public License v3.0.
 
-`waifu-1.1.7-slim.toolpkg` is a modified build of the Operit built-in plugin
-`com.operit.waifu`. The Operit project (AAswordman/Operit) is licensed under
-LGPL-3.0, and this modified version follows the same license.
+`waifu-1.1.8.toolpkg` is a modified build of the waifu plugin from the
+[Operit2](https://github.com/AAswordman/Operit2) repository
+(`plugins/packages/external/waifu/`), which is licensed under AGPL-3.0.
 
-All bundled sticker assets (53 images, ~3.6 MB) have been removed from this
-build to avoid redistributing the original author's artwork.
+All bundled sticker assets and core logic modules are unchanged from upstream.
+The only modifications are in the settings UI layer.
 
-No ownership of the original work is claimed. Rights holders may open an
-issue to request removal, which will be honored promptly.
+Source code is provided in full within both the package (`src/`) and this
+repository, satisfying the AGPL-3.0 source provision requirement.

@@ -1,6 +1,6 @@
 # 补丁改动明细
 
-记录 `waifu-1.1.7-slim.toolpkg` 相对官方 `com.operit.waifu` 1.1.4 的全部改动。
+记录 `waifu-1.1.8.toolpkg` 相对官方 `com.operit.waifu` 1.1.4 的全部改动。
 
 **改动范围：两个代码文件 + 资源清理。**
 

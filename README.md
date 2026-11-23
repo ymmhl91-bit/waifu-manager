@@ -2,7 +2,7 @@
 
 [![Operit](https://img.shields.io/badge/Operit-ToolPkg-blue)](https://github.com/ymmhl91-bit/operit-clawd)
 [![Python](https://img.shields.io/badge/Python-3.8%2B-brightgreen)](https://www.python.org/)
-[![License](https://img.shields.io/badge/License-LGPL--3.0-blue)](./LICENSE)
+[![License](https://img.shields.io/badge/License-AGPL--3.0-blue)](./LICENSE)
 [![Release](https://img.shields.io/github/v/release/ymmhl91-bit/waifu-manager)](https://github.com/ymmhl91-bit/waifu-manager/releases/latest)
 
 给 **Operit** 的 waifu 插件补上自定义情绪分类能力，并提供一个命令行管理器做批量整理。
@@ -29,7 +29,7 @@ const emotions = { crying: "哭泣", like_you: "喜欢你", happy: "开心", /* 
 
 本项目提供两样东西解决它：
 
-1. **`waifu-1.1.7-slim.toolpkg`** — 打过补丁的插件包，设置页支持新建/删除/重命名分类、图片跨类移动
+1. **`waifu-1.1.8.toolpkg`** — 打过补丁的插件包，设置页支持新建/删除/重命名分类、图片跨类移动
 2. **`manager/`** — 命令行工具，做批量归类、健康检查、方案导出导入
 
 ---
@@ -40,13 +40,13 @@ const emotions = { crying: "哭泣", like_you: "喜欢你", happy: "开心", /* 
 
 **1. 下载插件包**
 
-从 [Releases](https://github.com/ymmhl91-bit/waifu-manager/releases/latest) 下载 `waifu-1.1.7-slim.toolpkg`（66 KB）。
+从 [Releases](https://github.com/ymmhl91-bit/waifu-manager/releases/latest) 下载 `waifu-1.1.8.toolpkg`（3.68 MB）。
 
 或直接命令行：
 
 ```bash
-curl -L -o waifu-1.1.7-slim.toolpkg \
-  https://github.com/ymmhl91-bit/waifu-manager/releases/latest/download/waifu-1.1.7-slim.toolpkg
+curl -L -o waifu-1.1.8.toolpkg \
+  https://github.com/ymmhl91-bit/waifu-manager/releases/latest/download/waifu-1.1.8.toolpkg
 ```
 
 **2. 先卸载内置 waifu（重要）**
@@ -81,7 +81,7 @@ cp <runtime>/extensions/device/plugins/configs/com.operit.waifu/waifu.json  ~/wa
 **4. 导入新包**
 
 ```bash
-operit2 package import waifu-1.1.7-slim.toolpkg
+operit2 package import waifu-1.1.8.toolpkg
 operit2 package enable waifu
 ```
 
@@ -110,7 +110,7 @@ cp ~/waifu-backup/waifu.json  <runtime>/extensions/device/plugins/configs/com.op
 cp <runtime>/extensions/device/packages/waifu.toolpkg ~/waifu-backup.toolpkg
 
 # 替换
-cp waifu-1.1.7-slim.toolpkg <runtime>/extensions/device/packages/waifu.toolpkg
+cp waifu-1.1.8.toolpkg <runtime>/extensions/device/packages/waifu.toolpkg
 
 # 清缓存
 rm -rf <runtime>/cache/toolpkg/com.operit.waifu-*
@@ -301,8 +301,8 @@ operit2 package enable waifu
 ## 已知问题
 
 - **官方推送 waifu 更新时可能覆盖本版本**，且无提示。想长期用就别在官方渠道更新 waifu。
-- 版本号 `1.1.4 → 1.1.7`，仅用于区分与规避同版本覆盖判定。
-- 已移除全部内置表情资源，包体积 66 KB。
+- 版本号 `1.1.4 → 1.1.8`，仅用于区分与规避同版本覆盖判定。
+- 已移除全部内置表情资源，包体积 3.68 MB。
 - `src/` 与 `dist/` 已同步修改，重新编译不会丢改动。
 - 只改 `dist/ui/settings.ui.js`、`src/ui/settings.ui.ts`，以及 `settings.js/ts`、`stickers.js/ts` 的默认值，其余代码与原包一致。
 
@@ -317,7 +317,7 @@ operit2 package enable waifu
 ├── NOTICE                    # 许可依据与第三方声明
 ├── CHANGELOG.md
 ├── .gitignore
-├── waifu-1.1.7-slim.toolpkg        # 补丁版插件包
+├── waifu-1.1.8.toolpkg        # 补丁版插件包
 ├── manager/                   # 命令行管理工具
 │   ├── core.py
 │   ├── cli.py
@@ -332,23 +332,14 @@ operit2 package enable waifu
 
 ## 许可
 
-本项目以 **[LGPL-3.0](./LICENSE)** 发布。完整许可依据与第三方声明见 **[NOTICE](./NOTICE)**。
+本项目以 **[AGPL-3.0](./LICENSE)** 发布。完整许可依据与第三方声明见 **[NOTICE](./NOTICE)**。
 
-`waifu-1.1.7-slim.toolpkg` 是对 Operit 内置插件 `com.operit.waifu` 的修改版本。
-Operit 主程序（[AAswordman/Operit](https://github.com/AAswordman/Operit)）以 LGPL-3.0 发布，
-本修改版随之适用同一协议。
+上游是 [Operit2](https://github.com/AAswordman/Operit2) 仓库中的
+`plugins/packages/external/waifu/`，该仓库以 AGPL-3.0 发布，本修改版沿用同一协议。
 
-### 关于内置表情资源
+包内 `src/` 提供完整对应源码，满足 AGPL-3.0 的源码提供义务。
 
-原插件包含 53 张内置表情图片（约 3.6 MB）。**本构建已全部移除**，原因：
-
-- 避免再分发原作者的素材
-- 包体积从 3.68 MB 降到 **66 KB**
-
-因此首次使用时 `emojis` 为空、`enableEmoticons` 默认关闭。
-需自行在设置页导入图片，至少有一个分类后再开启表情开关。
-
-如果原作者认为本仓库仍有不当之处，请提 issue，会及时处理。
+非官方作品，与原插件作者无关。如有异议请提 issue，会及时处理。
 
 ---
 
