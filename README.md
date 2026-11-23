@@ -250,23 +250,61 @@ python3 cli.py apply
 
 ## 为什么不做独立插件
 
-曾考虑把功能做成独立 `toolpkg`，绕开 fork。**不可行**，原因有三：
+「独立插件」其实有三种不同做法，可行性各不相同。
 
-1. **写文件无效** —— 插件内存缓存不重读
-2. **写文件会被覆盖** —— 插件 flush 内存时覆盖
-3. **不能改名新建** —— `dist/main.js` 注册的 `settings.get` / `mode.status` / `session.feed` 都是全局名，两个包同名注册会冲突；且 qqbot 硬编码 `callDependency("com.operit.waifu")`，改名即断
+### 方案 A：独立包，去读写 waifu 的配置 
 
-所以只能 fork。代价见下方「已知问题」。
+**不可行。** waifu 把配置缓存在模块级单例里：
+
+```ts
+let config = null;
+function loadConfig() {
+  if (config === null) config = PluginConfig.use("waifu", {...});
+  return config;   // 进程活着就一直用这份
+}
+```
+
+由此两个致命问题：
+
+1. **外部写文件它看不见** —— 实测写入 `charDelayMs=777`，插件仍返回 `250`
+2. **它会覆盖你的写入** —— `writeSettings` 把内存里的整份 store flush 回文件，你在设置页点一下，外部改动就没了
+
+### 方案 B：独立 id，做 waifu 的替代品
+
+**不可行。** 两个障碍：
+
+- `dist/main.js` 注册的 `settings.get` / `mode.status` / `session.feed` 都是**全局名**，两个包同名注册会冲突，只能有一个生效
+- qqbot 硬编码了 `callDependency("com.operit.waifu")`，改名即断，QQ 的表情功能直接失效
+
+### 方案 C：保持同名 id 的 fork ← 本项目采用的
+
+**可行，已实测。** 关键是：**内置包可以卸载**。
+
+```bash
+operit2 package delete waifu        # 卸载内置版（配置目录一起删，需先备份）
+operit2 package import <新包>        # 装同名的新版
+operit2 package enable waifu
+```
+
+卸载后 `Built in` 变成 `false`，同名导入不再被 `Bundled ToolPkg cannot be replaced` 挡住。
+
+代价是：
+
+- 用户要先卸载，多一步操作
+- 卸载会清空配置，必须提前备份（详见上方安装步骤）
+- 官方若推送 waifu 更新，可能覆盖本版本
+
+**结论：** 想绕开 fork 是不行的，但 fork 可以走正规的卸载‑重装流程，而不必手动替换文件。本项目的商城版本就是按这种方式分发的。
 
 ---
 
 ## 已知问题
 
-- **插件市场更新会覆盖补丁**，且无提示。想长期用就别点更新。
+- **官方推送 waifu 更新时可能覆盖本版本**，且无提示。想长期用就别在官方渠道更新 waifu。
 - 版本号 `1.1.4 → 1.1.7`，仅用于区分与规避同版本覆盖判定。
 - 已移除全部内置表情资源，包体积 66 KB。
 - `src/` 与 `dist/` 已同步修改，重新编译不会丢改动。
-- 只改 waifu 包内的 `dist/ui/settings.ui.js` 与 `src/ui/settings.ui.ts`，其余文件与原包一致。
+- 只改 `dist/ui/settings.ui.js`、`src/ui/settings.ui.ts`，以及 `settings.js/ts`、`stickers.js/ts` 的默认值，其余代码与原包一致。
 
 ---
 
