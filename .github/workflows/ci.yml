@@ -12,11 +12,13 @@ jobs:
         run: |
           python3 -m py_compile manager/*.py
           echo "manager/*.py syntax OK"
-      - name: Toolpkg integrity
+      - name: Toolpkg integrity (download from Release)
         run: |
+          TAG=v1.1.8
+          curl -sSL -o /tmp/pkg.toolpkg "https://github.com/ymmhl91-bit/waifu-manager/releases/download/${TAG}/waifu-${TAG#v}.toolpkg"
           python3 - <<'PY'
           import zipfile, json
-          z = zipfile.ZipFile('waifu-1.1.8.toolpkg')
+          z = zipfile.ZipFile('/tmp/pkg.toolpkg')
           assert z.testzip() is None, 'corrupt entry'
           m = json.loads(z.read('manifest.json'))
           assert m['toolpkg_id'] == 'com.operit.waifu'
