@@ -49,7 +49,61 @@ curl -L -o waifu-1.1.7-slim.toolpkg \
   https://github.com/ymmhl91-bit/waifu-manager/releases/latest/download/waifu-1.1.7-slim.toolpkg
 ```
 
-**2. 替换插件文件**
+**2. 先卸载内置 waifu（重要）**
+
+`com.operit.waifu` 是 Operit 内置插件，直接导入会报：
+
+```
+Bundled ToolPkg cannot be replaced by a local import
+```
+
+所以要先卸载：**设置 → 插件管理 → Waifu 模式 → 卸载**，或命令行：
+
+```bash
+operit2 package delete waifu
+```
+
+> ### ⚠️ 卸载会连配置目录一起删掉
+>
+> 经实测，`package delete` 会移除 `configs/com.operit.waifu/` 整个目录，
+> 包括你导入的全部表情分类、自定义提示词、打字速度等设置。
+> **务必先备份。**
+
+**3. 备份配置**
+
+```bash
+# 把备份放到插件目录外面，否则会被一起删掉
+mkdir -p ~/waifu-backup
+cp <runtime>/extensions/device/plugins/configs/com.operit.waifu/mode.json   ~/waifu-backup/
+cp <runtime>/extensions/device/plugins/configs/com.operit.waifu/waifu.json  ~/waifu-backup/
+```
+
+**4. 导入新包**
+
+```bash
+operit2 package import waifu-1.1.7-slim.toolpkg
+operit2 package enable waifu
+```
+
+也可以在文件管理器里直接点开 `.toolpkg` 导入。
+
+**5. 还原配置**
+
+```bash
+# 卸载已把目录删了，先重建
+mkdir -p <runtime>/extensions/device/plugins/configs/com.operit.waifu
+
+cp ~/waifu-backup/mode.json   <runtime>/extensions/device/plugins/configs/com.operit.waifu/mode.json
+cp ~/waifu-backup/waifu.json  <runtime>/extensions/device/plugins/configs/com.operit.waifu/waifu.json
+```
+
+**6. 完全退出 Operit 再重开**
+
+不重启的话插件读完旧配置就不会再读文件，还原等于没做。
+
+---
+
+**不想卸载内置包？** 那就走纯文件替换，跳过上面步骤：
 
 ```bash
 # 备份原包
@@ -64,10 +118,9 @@ rm -rf <runtime>/cache/toolpkg/com.operit.waifu-*
 # 完全退出 Operit 再重开
 ```
 
-其中 `<runtime>` 形如 `/data/user/0/app.operit/files/runtime/identities/identity-*`。
+这种方式不动配置目录，表情分类等设置全部保留。
 
-> **不要用「导入插件」功能装这个包。** `com.operit.waifu` 是内置包，导入会报
-> `Bundled ToolPkg cannot be replaced by a local import`。必须走文件替换。
+其中 `<runtime>` 形如 `/data/user/0/app.operit/files/runtime/identities/identity-*`。
 
 ### 方式二：只用命令行工具
 
