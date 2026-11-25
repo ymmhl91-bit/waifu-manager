@@ -233,18 +233,36 @@ await PluginConfig.flush(store);   // 把内存整份写回
 
 ## QQ 与普通聊天是两套配置
 
-这是最容易踩的坑：
+这是最容易踩的坑。**同一份表情清单在磁盘上存了 4 份，彼此完全独立、不会自动同步**：
 
-| 场景 | 读哪里 | 开关 |
+| 配置来源 | 文件与键 | 实际作用 |
 |---|---|---|
-| 应用内普通聊天 | `mode.json` 的 `bindings["card:<uuid>"]` | 受 `enabled` 控制 |
-| QQ Bot | `waifu.json` 的 `profiles.default` | **不看 `enabled`**，读得到 profile 就启用 |
+| 角色卡绑定 | `mode.json` → `bindings["card:<uuid>"].settings.emojis` | **表情清单的唯一实际来源**：应用内普通聊天与 QQ Bot 自动回复都从这里取 |
+| 角色卡绑定 | 同上 → `.enabled` | 只控制应用内普通聊天的分句/打字机效果；QQ Bot 不看这个字段 |
+| profile | `waifu.json` → `profiles.<name>.emojis` | 供分库管理与设置页 profile 编辑使用；**不参与表情注入** |
+| 兜底绑定 | `mode.json` → `bindings["model:chat"]` | 仅未绑定角色卡的聊天才会走到这里 |
 
-整理完想让 QQ 也同步：
+### 为什么改 profile 没用
+
+自动回复链路（源码依据）：
+
+1. qqbot `service.js` 在自动回复时注入 `autoReply.characterSelection`——注意它嵌在 `autoReply` 对象里，**不是 bot 顶层字段**；
+2. waifu `mode.js` 的 `composePrompt` 按这个 selection 去查 `bindings[selection]`，表情清单就从这份 binding 里取；
+3. qqbot 同时会把 `bot.waifuProfile` 传给 waifu `settings.js` 的 `profiles[profile]`，但这条线走的是 profile 级配置，**不决定表情清单**。
+
+结论：`waifuProfile` 与 `characterSelection` 是两条并行的配置线，**表情以 binding 为准**。只改 profile、binding 留着旧路径，QQ 就会继续发旧图——这正是「两份 profile 都指向新目录、实际发出的还是旧表情」的原因。
+
+### 改完怎么同步
+
+把当前分类目录同步到所有 binding 与 `default` profile：
 
 ```bash
 python3 cli.py apply
 ```
+
+它会重写所有 binding 和 `default` profile 的 `emojis`。执行后**必须完全重启 Operit** 才生效——插件配置是模块级单例，只在进程启动时读一次文件，运行期外部改动不会被感知。
+
+> 若你的 bot 绑定了非 `default` 的 profile，请先确认 `cli.py profiles` 的输出，必要时用 `split-library` / `assign-bot` 调整后再 `apply`。
 
 ---
 
