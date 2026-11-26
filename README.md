@@ -233,36 +233,56 @@ await PluginConfig.flush(store);   // 把内存整份写回
 
 ## QQ 与普通聊天是两套配置
 
-这是最容易踩的坑。**同一份表情清单在磁盘上存了 4 份，彼此完全独立、不会自动同步**：
+这是最容易踩的坑：**应用内普通聊天和 QQ Bot 走两条完全不同的链路，读的不是同一份数据。**
 
-| 配置来源 | 文件与键 | 实际作用 |
+| 场景 | 实际读取位置 | 说明 |
 |---|---|---|
-| 角色卡绑定 | `mode.json` → `bindings["card:<uuid>"].settings.emojis` | **表情清单的唯一实际来源**：应用内普通聊天与 QQ Bot 自动回复都从这里取 |
-| 角色卡绑定 | 同上 → `.enabled` | 只控制应用内普通聊天的分句/打字机效果；QQ Bot 不看这个字段 |
-| profile | `waifu.json` → `profiles.<name>.emojis` | 供分库管理与设置页 profile 编辑使用；**不参与表情注入** |
-| 兜底绑定 | `mode.json` → `bindings["model:chat"]` | 仅未绑定角色卡的聊天才会走到这里 |
+| 应用内普通聊天 | `mode.json` → `bindings["card:<uuid>"].settings` | 按聊天当前绑定的角色卡取对应 binding；`enabled` 为 false 时不注入任何规则 |
+| **QQ Bot** | **`waifu.json` → `profiles[bot.waifuProfile]`** | **由 bot 配置里的 `waifuProfile` 字段决定，与 `mode.json` 的 binding 完全无关** |
 
-### 为什么改 profile 没用
+也就是说：**QQ Bot 的表情清单来自 profile，不是 binding。**
 
-自动回复链路（源码依据）：
+### 源码依据（为什么 QQ 走 profile）
 
-1. qqbot `service.js` 在自动回复时注入 `autoReply.characterSelection`——注意它嵌在 `autoReply` 对象里，**不是 bot 顶层字段**；
-2. waifu `mode.js` 的 `composePrompt` 按这个 selection 去查 `bindings[selection]`，表情清单就从这份 binding 里取；
-3. qqbot 同时会把 `bot.waifuProfile` 传给 waifu `settings.js` 的 `profiles[profile]`，但这条线走的是 profile 级配置，**不决定表情清单**。
+1. qqbot `service.js` 自动回复时调用 `replyStream(request, this.bot.waifuProfile, ...)`；
+2. `replyStream` 先经 `preferWaifu(profile)` 判定（`profile === "native"` 时退回原生聊天，否则调 `getSettings(profile)` 探测 waifu 是否可用）；
+3. 可用则走 `dependencies/waifu/api.js` 的 `stream()`，它调用 `session.open({ chatId, profile })`；
+4. waifu 侧 `sessionOpen()` 执行 `readSettings(event.payload.profile)`，把该 profile 的设置存入会话；
+5. waifu 侧 `composePrompt()` 里 `externalSettings(chatId)` 命中这个活跃会话后，**直接用会话里的 profile 设置**，不再查 `mode.json` 的 binding。
 
-结论：`waifuProfile` 与 `characterSelection` 是两条并行的配置线，**表情以 binding 为准**。只改 profile、binding 留着旧路径，QQ 就会继续发旧图——这正是「两份 profile 都指向新目录、实际发出的还是旧表情」的原因。
+### 典型症状
 
-### 改完怎么同步
+只改了 `profiles`、没动 binding，结果 QQ 侧表情没变（或反过来）。反过来只改 binding，QQ 侧同样没反应——因为两条链路根本不相交。
 
-把当前分类目录同步到所有 binding 与 `default` profile：
+排查顺序：
 
 ```bash
-python3 cli.py apply
+# 1. 看 bot 用的是哪个 profile
+python3 library.py bots
+
+# 2. 看各 profile 的表情清单
+python3 library.py profiles
 ```
 
-它会重写所有 binding 和 `default` profile 的 `emojis`。执行后**必须完全重启 Operit** 才生效——插件配置是模块级单例，只在进程启动时读一次文件，运行期外部改动不会被感知。
+### 多 bot 分库的正确做法
 
-> 若你的 bot 绑定了非 `default` 的 profile，请先确认 `cli.py profiles` 的输出，必要时用 `split-library` / `assign-bot` 调整后再 `apply`。
+给每个 bot 分配独立的 profile，各自指向不同目录：
+
+```bash
+# 新建 profile（从 default 复制一份，再单独换 emojis）
+python3 library.py create-profile feiyu
+
+# 把某个 bot 指到这个 profile
+python3 library.py assign-bot "QQ Bot 1" feiyu
+```
+
+`default` 建议保留作为兜底，不要占用给具体角色——它同时是多个 fallback 的默认值。
+
+### 改完必须重启
+
+插件配置是模块级单例，只在进程启动时读一次文件。**外部改动磁盘后，运行中的插件感知不到**，必须完全重启 Operit（从最近任务划掉进程）。
+
+> ⚠️ 不要在设置页改完配置后直接手改文件——设置页保存会把内存里的整份配置 flush 回磁盘，覆盖你的外部修改。
 
 ---
 
